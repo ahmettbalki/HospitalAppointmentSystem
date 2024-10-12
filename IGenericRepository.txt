@@ -1,0 +1,52 @@
+Bu sýnýf, generic bir repository arayüzü olan IGenericRepository'yi tanýmlýyor. 
+
+Bu arayüz, T tipi entity'ler üzerinde temel CRUD (Create, Read, Update, Delete) iþlemlerini gerçekleþtirmek için bir yapý saðlar.
+Ayrýca, belirli sorgu iþlemleri için IQueryable türünde dönüþler saðlar. 
+Þimdi bu sýnýfýn her bir parçasýný detaylý olarak açýklayalým:
+1. public interface IGenericRepository<T, TId> where T : Entity<TId>, new()
+Bu, generic bir repository arayüzüdür.
+T: Repository'nin iþlemlerini gerçekleþtireceði entity türünü temsil eder. Bu, Entity<TId> sýnýfýndan türemiþ olmalýdýr. 
+Bu, entity'nin bir kimlik (ID) alanýna sahip olacaðýný belirtir.
+Entity<TId>: Bu entity'nin TId türünde bir kimlik deðeri olduðu anlamýna gelir.
+new(): Bu kýsýt, T türü için bir parametresiz yapýcýya (constructor) sahip olmasý gerektiðini ifade eder. 
+Böylece T'nin bir örneði (new T()) alýnabilir.
+TId: Entity'nin kimlik (ID) türünü belirtir. Bu tür bir struct olabilir ve genellikle int, Guid gibi deðer tipleridir.
+2. IQueryable<T> GetAll();
+Bu metod, veritabanýndaki tüm T entity'lerini döndürmek için kullanýlýr.
+IQueryable<T>: Bu, sorguyu tembel (lazy) bir þekilde döndürür, yani veritabanýna hemen gitmez. 
+Veriler üzerinde sýralama, filtreleme gibi iþlemleri gerçekleþtirebilirsiniz. 
+Bu da performans açýsýndan avantaj saðlar, çünkü veritabanýna gereksiz yere sorgu gönderilmez.
+3. ValueTask<T> GetByIdAsync(TId id);
+Bu metod, belirtilen TId kimliðine sahip bir entity'yi asenkron olarak veritabanýndan getirir.
+ValueTask<T>: Bu, asenkron bir iþlemin sonucunu döndürür. 
+Task<T>'ye benzer ancak daha performanslýdýr, çünkü özellikle kýsa iþlemlerde daha az bellek kullanýmý saðlar.
+TId id: Entity'nin kimlik (ID) deðerini temsil eder ve bu deðer veritabanýnda eþleþen entity'yi bulmak için kullanýlýr.
+4. IQueryable<T> Where(Expression<Func<T, bool>> predicate);
+Bu metod, belirli bir koþula uyan entity'leri döndürür.
+Expression<Func<T, bool>> predicate: Bu, bir lambda ifadesi kullanarak sorgu oluþturmanýza olanak tanýr. 
+Örneðin, Where(x => x.Age > 18) gibi bir koþulla veritabanýndan 18 yaþýndan büyük kullanýcýlarý getirebilirsiniz.
+IQueryable<T>: Bu geri dönüþ tipi, veritabanýna gitmeden önce ek filtreler veya iþlemler yapýlmasýna olanak tanýr.
+5. Task<bool> AnyAsync(TId id);
+Bu metod, belirtilen id'ye sahip bir entity'nin olup olmadýðýný kontrol eder.
+Task<bool>: Bu, asenkron bir iþlem sonucu döner ve sonuçta true ya da false deðeri döner.
+TId id: Bu, kontrol edilmek istenen entity'nin kimlik (ID) deðeridir.
+6. ValueTask AddAsync(T entity);
+Bu metod, yeni bir T entity'sini veritabanýna ekler.
+ValueTask: Asenkron bir iþlemi belirtir ve bu iþlem tamamlandýðýnda bir sonuç dönmez (void türünde).
+Task yerine ValueTask kullanýmý, daha performanslý iþlemler için tercih edilir.
+T entity: Veritabanýna eklenecek entity nesnesini temsil eder.
+7. void Update(T entity);
+Bu metod, veritabanýndaki bir entity'nin güncellenmesini saðlar.
+void: Geri dönüþ deðeri yoktur, çünkü iþlem senkron olarak yapýlýr.
+T entity: Güncellenmek istenen entity nesnesini temsil eder. 
+Bu entity'nin veritabanýndaki mevcut kaydý, bu yeni deðerlerle deðiþtirilir.
+8. void Delete(T entity);
+Bu metod, belirtilen entity'nin veritabanýndan silinmesini saðlar.
+void: Ýþlemin senkron olduðunu ve geri dönüþ deðeri olmadýðýný belirtir.
+T entity: Silinmek istenen entity nesnesini temsil eder.
+Genel Yapý
+Bu IGenericRepository arayüzü, bir repository pattern'i kullanarak veri eriþim katmanýný soyutlamak için tasarlanmýþtýr. 
+CRUD iþlemlerini (veri ekleme, okuma, güncelleme, silme) gerçekleþtirmek için temel metotlar saðlar. 
+Generic yapý sayesinde birçok farklý entity için kullanýlabilir ve 
+TId ile kimlik deðerlerinin tipine esneklik katýlýr (örneðin, int veya Guid gibi). Ayrýca, Entity<TId>
+kýsýtlamasýyla her entity'nin bir kimlik deðeri olacaðý garanti altýna alýnýr.
