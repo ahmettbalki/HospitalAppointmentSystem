@@ -3,4 +3,5 @@ public sealed record AppointmentResponseDto(
     Guid Id,
     string PatientName,
     DateTime AppointmentDate,
-    int DoctorId);
+    int DoctorId,
+    string DoctorName);
